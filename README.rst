@@ -1,3 +1,5 @@
+Forked version to try Numba jit performance optimisation
+
 NetworkX
 ========
 
