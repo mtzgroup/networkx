@@ -3,6 +3,7 @@ Graph isomorphism functions.
 """
 import networkx as nx
 from networkx.exception import NetworkXError
+from numba import jit
 
 __all__ = [
     "could_be_isomorphic",
@@ -12,6 +13,7 @@ __all__ = [
 ]
 
 
+@jit(nopython=True)
 def could_be_isomorphic(G1, G2):
     """Returns False if graphs are definitely not isomorphic.
     True does NOT guarantee isomorphism.
@@ -53,6 +55,7 @@ def could_be_isomorphic(G1, G2):
 graph_could_be_isomorphic = could_be_isomorphic
 
 
+@jit(nopython=True)
 def fast_could_be_isomorphic(G1, G2):
     """Returns False if graphs are definitely not isomorphic.
 
@@ -92,6 +95,7 @@ def fast_could_be_isomorphic(G1, G2):
 fast_graph_could_be_isomorphic = fast_could_be_isomorphic
 
 
+@jit(nopython=True)
 def faster_could_be_isomorphic(G1, G2):
     """Returns False if graphs are definitely not isomorphic.
 
@@ -124,6 +128,7 @@ def faster_could_be_isomorphic(G1, G2):
 faster_graph_could_be_isomorphic = faster_could_be_isomorphic
 
 
+@jit(nopython=True)
 def is_isomorphic(G1, G2, node_match=None, edge_match=None):
     """Returns True if the graphs G1 and G2 are isomorphic and False otherwise.
 

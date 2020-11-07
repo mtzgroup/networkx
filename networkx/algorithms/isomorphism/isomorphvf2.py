@@ -140,6 +140,7 @@ polynomial-time algorithm is known to exist).
 # Complexity Sciences Center and Physics Department, UC Davis.
 
 import sys
+from numba import jit
 
 __all__ = ["GraphMatcher", "DiGraphMatcher"]
 
@@ -199,6 +200,7 @@ class GraphMatcher:
         # we should turn this into a non-recursive implementation.
         sys.setrecursionlimit(self.old_recursion_limit)
 
+    @jit(nopython=True)
     def candidate_pairs_iter(self):
         """Iterator over candidate pairs of nodes in G1 and G2."""
 
@@ -263,6 +265,7 @@ class GraphMatcher:
         # Provide a convenient way to access the isomorphism mapping.
         self.mapping = self.core_1.copy()
 
+    @jit(nopython=True)
     def is_isomorphic(self):
         """Returns True if G1 and G2 are isomorphic graphs."""
 
@@ -293,6 +296,7 @@ class GraphMatcher:
         self.initialize()
         yield from self.match()
 
+    @jit(nopython=True)
     def match(self):
         """Extends the isomorphism mapping.
 
@@ -318,6 +322,7 @@ class GraphMatcher:
                         # restore data structures
                         newstate.restore()
 
+    @jit(nopython=True)
     def semantic_feasibility(self, G1_node, G2_node):
         """Returns True if adding (G1_node, G2_node) is symantically feasible.
 
@@ -358,6 +363,7 @@ class GraphMatcher:
         """
         return True
 
+    @jit(nopython=True)
     def subgraph_is_isomorphic(self):
         """Returns True if a subgraph of G1 is isomorphic to G2."""
         try:
@@ -366,6 +372,7 @@ class GraphMatcher:
         except StopIteration:
             return False
 
+    @jit(nopython=True)
     def subgraph_is_monomorphic(self):
         """Returns True if a subgraph of G1 is monomorphic to G2."""
         try:
@@ -376,6 +383,7 @@ class GraphMatcher:
 
     #    subgraph_is_isomorphic.__doc__ += "\n" + subgraph.replace('\n','\n'+indent)
 
+    @jit(nopython=True)
     def subgraph_isomorphisms_iter(self):
         """Generator over isomorphisms between a subgraph of G1 and G2."""
         # Declare that we are looking for graph-subgraph isomorphism.
@@ -383,6 +391,7 @@ class GraphMatcher:
         self.initialize()
         yield from self.match()
 
+    @jit(nopython=True)
     def subgraph_monomorphisms_iter(self):
         """Generator over monomorphisms between a subgraph of G1 and G2."""
         # Declare that we are looking for graph-subgraph monomorphism.
@@ -392,6 +401,7 @@ class GraphMatcher:
 
     #    subgraph_isomorphisms_iter.__doc__ += "\n" + subgraph.replace('\n','\n'+indent)
 
+    @jit(nopython=True)
     def syntactic_feasibility(self, G1_node, G2_node):
         """Returns True if adding (G1_node, G2_node) is syntactically feasible.
 
@@ -538,6 +548,7 @@ class DiGraphMatcher(GraphMatcher):
         """
         super().__init__(G1, G2)
 
+    @jit(nopython=True)
     def candidate_pairs_iter(self):
         """Iterator over candidate pairs of nodes in G1 and G2."""
 
@@ -585,6 +596,7 @@ class DiGraphMatcher(GraphMatcher):
 
         # For all other cases, we don't have any candidate pairs.
 
+    @jit(nopython=True)
     def initialize(self):
         """Reinitializes the state of the algorithm.
 
@@ -619,6 +631,7 @@ class DiGraphMatcher(GraphMatcher):
         # Provide a convenient way to access the isomorphism mapping.
         self.mapping = self.core_1.copy()
 
+    @jit(nopython=True)
     def syntactic_feasibility(self, G1_node, G2_node):
         """Returns True if adding (G1_node, G2_node) is syntactically feasible.
 
@@ -852,6 +865,7 @@ class GMState:
     strategy employed by the VF2 algorithm.
     """
 
+    @jit(nopython=True)
     def __init__(self, GM, G1_node=None, G2_node=None):
         """Initializes GMState object.
 
@@ -915,6 +929,7 @@ class GMState:
                 if node not in GM.inout_2:
                     GM.inout_2[node] = self.depth
 
+    @jit(nopython=True)
     def restore(self):
         """Deletes the GMState object and restores the class variables."""
         # First we remove the node that was added from the core vectors.
@@ -941,6 +956,7 @@ class DiGMState:
 
     """
 
+    @jit(nopython=True)
     def __init__(self, GM, G1_node=None, G2_node=None):
         """Initializes DiGMState object.
 
@@ -1044,6 +1060,7 @@ class DiGMState:
                 if node not in GM.out_2:
                     GM.out_2[node] = self.depth
 
+    @jit(nopython=True)
     def restore(self):
         """Deletes the DiGMState object and restores the class variables."""
 

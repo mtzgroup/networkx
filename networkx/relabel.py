@@ -1,8 +1,10 @@
 import networkx as nx
+from numba import jit
 
 __all__ = ["convert_node_labels_to_integers", "relabel_nodes"]
 
 
+@jit(nopython=True)
 def relabel_nodes(G, mapping, copy=True):
     """Relabel the nodes of the graph G according to a given mapping.
 
@@ -121,6 +123,7 @@ def relabel_nodes(G, mapping, copy=True):
         return _relabel_inplace(G, m)
 
 
+@jit(nopython=True)
 def _relabel_inplace(G, mapping):
     old_labels = set(mapping.keys())
     new_labels = set(mapping.values())
@@ -188,6 +191,7 @@ def _relabel_inplace(G, mapping):
     return G
 
 
+@jit(nopython=True)
 def _relabel_copy(G, mapping):
     H = G.__class__()
     H.add_nodes_from(mapping.get(n, n) for n in G)
@@ -221,6 +225,7 @@ def _relabel_copy(G, mapping):
     return H
 
 
+@jit(nopython=True)
 def convert_node_labels_to_integers(
     G, first_label=0, ordering="default", label_attribute=None
 ):

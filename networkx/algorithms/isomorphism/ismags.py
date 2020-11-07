@@ -112,8 +112,10 @@ __all__ = ["ISMAGS"]
 from collections import defaultdict, Counter
 from functools import reduce, wraps
 import itertools
+from numba import jit
 
 
+@jit(nopython=True)
 def are_all_equal(iterable):
     """
     Returns ``True`` if and only if all elements in `iterable` are equal; and
@@ -144,6 +146,7 @@ def are_all_equal(iterable):
     return all(item == first for item in iterator)
 
 
+@jit(nopython=True)
 def make_partitions(items, test):
     """
     Partitions items into sets based on the outcome of ``test(item1, item2)``.
@@ -182,6 +185,7 @@ def make_partitions(items, test):
     return partitions
 
 
+@jit(nopython=True)
 def partition_to_color(partitions):
     """
     Creates a dictionary with for every item in partition for every partition
@@ -203,6 +207,7 @@ def partition_to_color(partitions):
     return colors
 
 
+@jit(nopython=True)
 def intersect(collection_of_sets):
     """
     Given an collection of sets, returns the intersection of those sets.
@@ -333,6 +338,7 @@ class ISMAGS:
             self.edge_equality = self._edge_match_maker(edge_match)
 
     @property
+    @jit(nopython=True)
     def _sgn_partitions(self):
         if self._sgn_partitions_ is None:
 
@@ -343,6 +349,7 @@ class ISMAGS:
         return self._sgn_partitions_
 
     @property
+    @jit(nopython=True)
     def _sge_partitions(self):
         if self._sge_partitions_ is None:
 
@@ -353,6 +360,7 @@ class ISMAGS:
         return self._sge_partitions_
 
     @property
+    @jit(nopython=True)
     def _gn_partitions(self):
         if self._gn_partitions_ is None:
 
@@ -363,6 +371,7 @@ class ISMAGS:
         return self._gn_partitions_
 
     @property
+    @jit(nopython=True)
     def _ge_partitions(self):
         if self._ge_partitions_ is None:
 
@@ -373,6 +382,7 @@ class ISMAGS:
         return self._ge_partitions_
 
     @property
+    @jit(nopython=True)
     def _sgn_colors(self):
         if self._sgn_colors_ is None:
             self._sgn_colors_ = partition_to_color(self._sgn_partitions)
@@ -397,6 +407,7 @@ class ISMAGS:
         return self._ge_colors_
 
     @property
+    @jit(nopython=True)
     def _node_compatibility(self):
         if self._node_compat_ is not None:
             return self._node_compat_
@@ -411,6 +422,7 @@ class ISMAGS:
         return self._node_compat_
 
     @property
+    @jit(nopython=True)
     def _edge_compatibility(self):
         if self._edge_compat_ is not None:
             return self._edge_compat_
@@ -440,6 +452,7 @@ class ISMAGS:
 
         return comparer
 
+    @jit(nopython=True)
     def find_isomorphisms(self, symmetry=True):
         """Find all subgraph isomorphisms between subgraph and graph
 
@@ -489,6 +502,7 @@ class ISMAGS:
             return
 
     @staticmethod
+    @jit(nopython=True)
     def _find_neighbor_color_count(graph, node, node_color, edge_color):
         """
         For `node` in `graph`, count the number of edges of a specific color
@@ -505,6 +519,7 @@ class ISMAGS:
             counts[e_color, n_color] += 1
         return counts
 
+    @jit(nopython=True)
     def _get_lookahead_candidates(self):
         """
         Returns a mapping of {subgraph node: collection of graph nodes} for
@@ -537,6 +552,7 @@ class ISMAGS:
                     candidates[sgn].add(gn)
         return candidates
 
+    @jit(nopython=True)
     def largest_common_subgraph(self, symmetry=True):
         """
         Find the largest common induced subgraphs between :attr:`subgraph` and
@@ -576,6 +592,7 @@ class ISMAGS:
         else:
             return
 
+    @jit(nopython=True)
     def analyze_symmetry(self, graph, node_partitions, edge_colors):
         """
         Find a minimal set of permutations and corresponding co-sets that
@@ -614,6 +631,7 @@ class ISMAGS:
             self._symmetry_cache[key] = permutations, cosets
         return permutations, cosets
 
+    @jit(nopython=True)
     def is_isomorphic(self, symmetry=False):
         """
         Returns True if :attr:`graph` is isomorphic to :attr:`subgraph` and
@@ -627,6 +645,7 @@ class ISMAGS:
             symmetry
         )
 
+    @jit(nopython=True)
     def subgraph_is_isomorphic(self, symmetry=False):
         """
         Returns True if a subgraph of :attr:`graph` is isomorphic to
@@ -642,6 +661,7 @@ class ISMAGS:
         isom = next(self.subgraph_isomorphisms_iter(symmetry=symmetry), None)
         return isom is not None
 
+    @jit(nopython=True)
     def isomorphisms_iter(self, symmetry=True):
         """
         Does the same as :meth:`find_isomorphisms` if :attr:`graph` and
@@ -650,10 +670,12 @@ class ISMAGS:
         if len(self.graph) == len(self.subgraph):
             yield from self.subgraph_isomorphisms_iter(symmetry=symmetry)
 
+    @jit(nopython=True)
     def subgraph_isomorphisms_iter(self, symmetry=True):
         """Alternative name for :meth:`find_isomorphisms`."""
         return self.find_isomorphisms(symmetry)
 
+    @jit(nopython=True)
     def _find_nodecolor_candidates(self):
         """
         Per node in subgraph find all nodes in graph that have the same color.
@@ -672,6 +694,7 @@ class ISMAGS:
         return candidates
 
     @staticmethod
+    @jit(nopython=True)
     def _make_constraints(cosets):
         """
         Turn cosets into constraints.
@@ -685,6 +708,7 @@ class ISMAGS:
         return constraints
 
     @staticmethod
+    @jit(nopython=True)
     def _find_node_edge_color(graph, node_colors, edge_colors):
         """
         For every node in graph, come up with a color that combines 1) the
@@ -710,6 +734,7 @@ class ISMAGS:
         return node_edge_colors
 
     @staticmethod
+    @jit(nopython=True)
     def _get_permutations_by_length(items):
         """
         Get all permutations of items, but only permute items with the same
@@ -734,6 +759,7 @@ class ISMAGS:
         )
 
     @classmethod
+    @jit(nopython=True)
     def _refine_node_partitions(cls, graph, node_partitions, edge_colors, branch=False):
         """
         Given a partition of nodes in graph, make the partitions smaller such
@@ -741,6 +767,7 @@ class ISMAGS:
         number of edges to specific other partitions.
         """
 
+        @jit(nopython=True)
         def equal_color(node1, node2):
             return node_edge_colors[node1] == node_edge_colors[node2]
 
@@ -784,6 +811,7 @@ class ISMAGS:
         for n_p in output:
             yield from cls._refine_node_partitions(graph, n_p, edge_colors, branch)
 
+    @jit(nopython=True)
     def _edges_of_same_color(self, sgn1, sgn2):
         """
         Returns all edges in :attr:`graph` that have the same colour as the
@@ -801,6 +829,7 @@ class ISMAGS:
             g_edges = []
         return g_edges
 
+    @jit(nopython=True)
     def _map_nodes(self, sgn, candidates, constraints, mapping=None, to_be_mapped=None):
         """
         Find all subgraph isomorphisms honoring constraints.
@@ -881,6 +910,7 @@ class ISMAGS:
             # when making a new mapping for sgn.
             # del mapping[sgn]
 
+    @jit(nopython=True)
     def _largest_common_subgraph(self, candidates, constraints, to_be_mapped=None):
         """
         Find all largest common subgraphs honoring constraints.
@@ -952,6 +982,7 @@ class ISMAGS:
         )
 
     @staticmethod
+    @jit(nopython=True)
     def _remove_node(node, nodes, constraints):
         """
         Returns a new set where node has been removed from nodes, subject to
@@ -969,6 +1000,7 @@ class ISMAGS:
         return frozenset(nodes - {node})
 
     @staticmethod
+    @jit(nopython=True)
     def _find_permutations(top_partitions, bottom_partitions):
         """
         Return the pairs of top/bottom partitions where the partitions are
@@ -989,6 +1021,7 @@ class ISMAGS:
         return permutations
 
     @staticmethod
+    @jit(nopython=True)
     def _update_orbits(orbits, permutations):
         """
         Update orbits based on permutations. Orbits is modified in place.
@@ -1011,6 +1044,7 @@ class ISMAGS:
                 orbits[first].update(orbits[second])
                 del orbits[second]
 
+    @jit(nopython=True)
     def _couple_nodes(
         self,
         top_partitions,
@@ -1052,6 +1086,7 @@ class ISMAGS:
         for bot in new_bottom_partitions:
             yield list(new_top_partitions), bot
 
+    @jit(nopython=True)
     def _process_ordered_pair_partitions(
         self,
         graph,
